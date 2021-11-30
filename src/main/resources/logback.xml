@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+<!--            TraceId and SpanId to be added to pattern as %mdc{traceId:-default} and %mdc{spanId:-default}-->
+<!--            See https://cloud.spring.io/spring-cloud-sleuth/reference/html/#configuration-properties-->
+            <Pattern>
+                %d{HH:mm:ss.SSS} [%t] traceId:%mdc{traceId:-No_TraceId} spanId:%mdc{spanId:-No_SpanId} %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="com.mkyong" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
