@@ -1,11 +1,19 @@
 package com.dagacube.domain.controller.v1;
 
-import com.dagacube.api.v1.model.UserTransactionsRequest;
-import com.dagacube.domain.model.PlayerTransaction;
-import com.dagacube.domain.service.UserWalletService;
+import com.dagacube.api.v1.model.Player;
+import com.dagacube.api.v1.model.PlayerTransactionsRequest;
+import com.dagacube.domain.repository.entity.PlayerTransaction;
+import com.dagacube.domain.service.PlayerService;
+import com.dagacube.exception.DagacubeUserAuthorizationException;
+import com.dagacube.exception.PlayerInsufficientFundsException;
+import com.dagacube.exception.PlayerExistsException;
+import com.dagacube.exception.PlayerNotFoundException;
+import com.dagacube.exception.TransactionInconsistencyException;
 import com.dagacube.mapper.PlayerTransactionMapper;
+import com.dagacube.security.SecurityService;
 import com.dagacube.util.validation.ValidationUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,51 +35,68 @@ import java.util.List;
 @Slf4j
 public class DagacubeControllerV1 {
 
-	private final UserWalletService userWalletService;
+	private static final String PLAYER_HISTORY_USER = "pam";//Specially for Pam
+	private final PlayerService playerService;
+	private final SecurityService securityService;
 
-	public DagacubeControllerV1(UserWalletService userWalletService) {
-		this.userWalletService = userWalletService;
+	public DagacubeControllerV1(PlayerService playerService, SecurityService securityService) {
+		this.playerService = playerService;
+		this.securityService = securityService;
 	}
 
-	@GetMapping(value = "/{playerId}/balance")
-	public ResponseEntity<BigDecimal> getUserBalance(@PathVariable int userId) {
-
-		return ResponseEntity.ok().body(userWalletService.getUserBalance(userId));
-
-	}
-
-	@PostMapping(value = "/{playerId}/wager/{amount}")
-	public ResponseEntity wager(@PathVariable String playerId,
-								@PathVariable BigDecimal amount,
-								@RequestHeader String transactionId) {
-
-		userWalletService.wager(playerId, amount, transactionId);
-
-		return ResponseEntity.ok().build();
-	}
-
-	@PostMapping(value = "/{playerId}/win/{amount}")
-	public ResponseEntity win(@PathVariable String playerId,
-							  @PathVariable BigDecimal amount,
-							  @RequestHeader String transactionId) {
-
-		userWalletService.win(playerId, amount, transactionId);
-
-		return ResponseEntity.ok().build();
-	}
-
-	@PostMapping(value = "/{username}/transactions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getUserTransactions(@RequestBody UserTransactionsRequest userTransactionsRequest) {
-
-		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(userTransactionsRequest);
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> createPlayer(@RequestBody Player player) throws PlayerExistsException {
+		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(player);
 		if (validationResult != null) {
 			return validationResult;
 		}
 
-		List<PlayerTransaction> playerTransactions = userWalletService.getPlayerTransactions(userTransactionsRequest.getUserName(),
-				userTransactionsRequest.getCount() == null ? 10 : userTransactionsRequest.getCount());
+		Long playerId = playerService.createPlayer(player.getUsername(), player.getBalance());
 
+		return ResponseEntity.status(HttpStatus.CREATED).body(playerId);
+	}
 
+	@GetMapping(value = "/{playerId}/balance")
+	public ResponseEntity<BigDecimal> getUserBalance(@PathVariable int playerId) throws PlayerNotFoundException {
+
+		return ResponseEntity.ok().body(playerService.getUserBalance(playerId));
+
+	}
+
+	@PostMapping(value = "/{playerId}/wager/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity wager(@PathVariable long playerId,
+								@PathVariable BigDecimal amount,
+								@RequestHeader String transactionId) throws PlayerInsufficientFundsException, PlayerNotFoundException,
+			TransactionInconsistencyException {
+
+		PlayerTransaction playerTransaction = playerService.wager(playerId, amount, transactionId);
+
+		return ResponseEntity.ok(playerTransaction.getId());
+	}
+
+	@PostMapping(value = "/{playerId}/win/{amount}")
+	public ResponseEntity win(@PathVariable long playerId,
+							  @PathVariable BigDecimal amount,
+							  @RequestHeader String transactionId) throws PlayerNotFoundException, TransactionInconsistencyException {
+
+		PlayerTransaction playerTransaction = playerService.win(playerId, amount, transactionId);
+
+		return ResponseEntity.ok(playerTransaction.getId());
+	}
+
+	@PostMapping(value = "/{username}/transactions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getUserTransactions(@RequestBody PlayerTransactionsRequest playerTransactionsRequest) throws PlayerNotFoundException,
+			DagacubeUserAuthorizationException {
+
+		securityService.verifyPassword(PLAYER_HISTORY_USER, playerTransactionsRequest.getPassword());
+
+		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(playerTransactionsRequest);
+		if (validationResult != null) {
+			return validationResult;
+		}
+
+		List<PlayerTransaction> playerTransactions = playerService.getPlayerTransactions(playerTransactionsRequest.getUsername(),
+				playerTransactionsRequest.getCount() == null ? 10 : playerTransactionsRequest.getCount());
 
 		return ResponseEntity.ok().body(PlayerTransactionMapper.INSTANCE.mapToV1(playerTransactions));
 

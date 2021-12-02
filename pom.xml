@@ -19,7 +19,7 @@
         <io.springfox.version>2.7.0</io.springfox.version>
         <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
         <slf4j.api.version>1.7.30</slf4j.api.version>
-        <spring-cloud.version>2020.0.3</spring-cloud.version>
+        <spring-cloud.version>2020.0.4</spring-cloud.version>
         <org.springframework.version>5.3.9</org.springframework.version>
         <javax.servlet.version>2.5</javax.servlet.version>
         <javax.validation.version>2.0.1.Final</javax.validation.version>
@@ -97,11 +97,16 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--google-->
+        <!--google and other misc-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${com.google.code.gson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
 
         <!--Documentation-->

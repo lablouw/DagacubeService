@@ -1,0 +1,33 @@
+POST http://localhost:9000/dagacube-service/v1/dagacubeService
+Content-Type: application/json
+cookie: a;lskdjf;alsdjkf;lakjdfaldkjflsadjf
+
+{
+  "username": "Lloyd2",
+  "balance": 100
+}
+
+###
+
+GET http://localhost:9000/dagacube-service/v1/dagacubeService/1/balance
+
+###
+
+POST http://localhost:9000/dagacube-service/v1/dagacubeService/1/wager/50
+transactionId: txnid1
+
+###
+
+POST http://localhost:9000/dagacube-service/v1/dagacubeService/1/win/50
+transactionId: txnid2
+
+###
+
+POST http://localhost:9000/dagacube-service/v1/dagacubeService/Lloyd/transactions
+Content-Type: application/json
+
+{
+  "username": "Lloyd2",
+  "password": "swordfish"
+}
+

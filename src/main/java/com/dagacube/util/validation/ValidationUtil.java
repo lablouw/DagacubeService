@@ -46,7 +46,7 @@ public class ValidationUtil {
 		if (!CollectionUtils.isEmpty(constraintViolations)) {
 			validationFailures.addAll(constraintViolations
 					.stream()
-					.map(cv -> cv.getLeafBean().toString() + ": " + cv.getMessage())
+					.map(cv -> cv.getLeafBean().toString() + ": "+cv.getPropertyPath()+": " + cv.getMessage())
 					.collect(Collectors.toList())
 			);
 		}

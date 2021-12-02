@@ -1,6 +1,6 @@
 package com.dagacube.mapper;
 
-import com.dagacube.api.v1.model.PlayerTransaction;
+import com.dagacube.domain.repository.entity.PlayerTransaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
@@ -12,6 +12,8 @@ import java.util.List;
 public interface PlayerTransactionMapper {
 	PlayerTransactionMapper INSTANCE = Mappers.getMapper(PlayerTransactionMapper.class);
 
-	List<PlayerTransaction> mapToV1(List<com.dagacube.domain.model.PlayerTransaction> value);
+	List<com.dagacube.api.v1.model.PlayerTransaction> mapToV1(List<PlayerTransaction> value);
+
+	com.dagacube.api.v1.model.PlayerTransaction mapToV1(PlayerTransaction value);
 
 }

@@ -1,4 +1,4 @@
-package com.dagacube.domain.model;
+package com.dagacube.domain.repository.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,16 +16,14 @@ import javax.persistence.Id;
 @Builder
 @Data
 @Entity
-public class Player {
-
+public class DagacubeSystemUser {
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 
-	@Column(name = "username")
+	@Column(unique = true, nullable = false)
 	private String username;
 
-	@Column(name = "balance")
-	private String balance;
-
+	@Column(nullable = false)
+	private String password;
 }

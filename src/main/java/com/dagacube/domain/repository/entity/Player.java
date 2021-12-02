@@ -1,6 +1,5 @@
-package com.dagacube.domain.model;
+package com.dagacube.domain.repository.entity;
 
-import com.dagacube.domain.model.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,29 +11,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.math.BigDecimal;
-import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
 @Entity
-public class PlayerTransaction {
+public class Player {
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	private Long id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 
-	@Column(name = "created")
-	private Date created;
+	@Column(unique = true, nullable = false)
+	private String username;
 
-	@Column(name = "player")
-	private long playerId;
-
-	@Column(name = "transactionType")
-	private TransactionType transactionType;
-
-	@Column(name = "balance")
+	@Column(nullable = false)
 	private BigDecimal balance;
 
 }

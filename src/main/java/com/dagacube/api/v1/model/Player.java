@@ -4,13 +4,14 @@ import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Data
 @ApiModel
-public class UserTransactionsRequest {
+public class Player {
 	@NotBlank
-	private String userName;
-	@NotBlank
-	private String password;
-	private Integer count;
+	private String username;
+	@NotNull
+	private BigDecimal balance;
 }
