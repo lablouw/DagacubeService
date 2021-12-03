@@ -84,7 +84,7 @@ public class DagacubeControllerV1 {
 		return ResponseEntity.ok(playerTransaction.getId());
 	}
 
-	@PostMapping(value = "/{username}/transactions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/transactions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getUserTransactions(@RequestBody PlayerTransactionsRequest playerTransactionsRequest) throws PlayerNotFoundException,
 			DagacubeUserAuthorizationException {
 
