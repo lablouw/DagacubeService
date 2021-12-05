@@ -1,7 +1,6 @@
 ### Create user
 POST http://localhost:9000/dagacube-service/v1/dagacubeService
 Content-Type: application/json
-cookie: a;lskdjf;alsdjkf;lakjdfaldkjflsadjf
 
 {
   "username": "Lloyd",
@@ -14,13 +13,25 @@ GET http://localhost:9000/dagacube-service/v1/dagacubeService/1/balance
 
 
 ### Wager
-POST http://localhost:9000/dagacube-service/v1/dagacubeService/1/wager/50
-Transactionid: txnid1
+POST http://localhost:9000/dagacube-service/v1/dagacubeService/wager
+Content-Type: application/json
+TransactionId: txn6
+
+{
+  "playerId": "1",
+  "amount": 50
+}
 
 
 ### Win
-POST http://localhost:9000/dagacube-service/v1/dagacubeService/1/win/50
-Transactionid: txnid2
+POST http://localhost:9000/dagacube-service/v1/dagacubeService/win
+Content-Type: application/json
+TransactionId: txn3
+
+{
+  "playerId": "1",
+  "amount": 50
+}
 
 
 ### player transaction history. Enter you super secret password in the body below
@@ -29,6 +40,6 @@ Content-Type: application/json
 
 {
   "username": "Lloyd",
-  "password": ""
+  "password": "swordfish"
 }
 

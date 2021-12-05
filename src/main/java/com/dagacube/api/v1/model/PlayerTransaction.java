@@ -9,12 +9,10 @@ import java.util.Date;
 @Data
 @ApiModel
 public class PlayerTransaction {
-
 	private Long id;
 	private Date created;
 	private String transactionType;
 	private BigDecimal amount;
 	private BigDecimal postBalance;
 	private String transactionId;
-
 }

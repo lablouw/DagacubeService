@@ -2,14 +2,15 @@ package com.dagacube.domain.controller.v1;
 
 import com.dagacube.api.v1.model.Player;
 import com.dagacube.api.v1.model.PlayerTransactionsRequest;
+import com.dagacube.api.v1.model.WagerWinRequest;
 import com.dagacube.domain.repository.entity.PlayerTransaction;
 import com.dagacube.domain.service.PlayerService;
-import com.dagacube.exception.DagacubeUserAuthorizationException;
-import com.dagacube.exception.PlayerInsufficientFundsException;
 import com.dagacube.exception.PlayerExistsException;
+import com.dagacube.exception.PlayerInsufficientFundsException;
 import com.dagacube.exception.PlayerNotFoundException;
-import com.dagacube.exception.TransactionInconsistencyException;
+import com.dagacube.exception.SystemUserAuthorizationException;
 import com.dagacube.mapper.PlayerTransactionMapper;
+import com.dagacube.mapper.WagerWinRequestMapper;
 import com.dagacube.security.SecurityService;
 import com.dagacube.util.validation.ValidationUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +28,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.List;
 
-// Service layer should contain only input validation and calls to manager classes.
-// No non-domain classes are to be passed into the manager layer, mapping between api and domain classes to take place here.
+// Controller layer should contain only input validation and calls to service classes.
+// No non-domain classes are to be passed into the service layer, mapping between api and domain classes to take place here.
 
 @RestController
 @RequestMapping("/v1/dagacubeService")
 @Slf4j
 public class DagacubeControllerV1 {
 
-	private static final String PLAYER_HISTORY_USER = "pam";//Specially for Pam
+	private static final String PLAYER_HISTORY_USER = "pam";//Especially for Pam
 	private final PlayerService playerService;
 	private final SecurityService securityService;
 
@@ -63,30 +64,37 @@ public class DagacubeControllerV1 {
 
 	}
 
-	@PostMapping(value = "/{playerId}/wager/{amount}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity wager(@PathVariable long playerId,
-								@PathVariable BigDecimal amount,
-								@RequestHeader String transactionId) throws PlayerInsufficientFundsException, PlayerNotFoundException,
-			TransactionInconsistencyException {
+	@PostMapping(value = "/wager", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity wager(@RequestBody WagerWinRequest wagerWinRequest, @RequestHeader String transactionId) throws PlayerInsufficientFundsException, PlayerNotFoundException {
+		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(wagerWinRequest);
+		if (validationResult != null) {
+			return validationResult;
+		}
 
-		PlayerTransaction playerTransaction = playerService.wager(playerId, amount, transactionId);
+		com.dagacube.domain.model.WagerWinRequest wwr = WagerWinRequestMapper.INSTANCE.mapToModel(wagerWinRequest, transactionId);
+
+		PlayerTransaction playerTransaction = playerService.doWager(wwr);
 
 		return ResponseEntity.ok(playerTransaction.getId());
 	}
 
-	@PostMapping(value = "/{playerId}/win/{amount}")
-	public ResponseEntity win(@PathVariable long playerId,
-							  @PathVariable BigDecimal amount,
-							  @RequestHeader String transactionId) throws PlayerNotFoundException, TransactionInconsistencyException {
+	@PostMapping(value = "/win", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity win(@RequestBody WagerWinRequest wagerWinRequest, @RequestHeader String transactionId) throws PlayerNotFoundException {
+		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(wagerWinRequest);
+		if (validationResult != null) {
+			return validationResult;
+		}
 
-		PlayerTransaction playerTransaction = playerService.win(playerId, amount, transactionId);
+		com.dagacube.domain.model.WagerWinRequest wwr = WagerWinRequestMapper.INSTANCE.mapToModel(wagerWinRequest, transactionId);
+
+		PlayerTransaction playerTransaction = playerService.doWin(wwr);
 
 		return ResponseEntity.ok(playerTransaction.getId());
 	}
 
 	@PostMapping(value = "/transactions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getUserTransactions(@RequestBody PlayerTransactionsRequest playerTransactionsRequest) throws PlayerNotFoundException,
-			DagacubeUserAuthorizationException {
+			SystemUserAuthorizationException {
 
 		securityService.verifyPassword(PLAYER_HISTORY_USER, playerTransactionsRequest.getPassword());
 

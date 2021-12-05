@@ -1,10 +1,13 @@
 package com.dagacube.config;
 
+import com.dagacube.domain.service.PromotionService;
+import com.dagacube.domain.service.PromotionServiceImpl;
 import com.dagacube.domain.service.PlayerService;
 import com.dagacube.aspect.RestBoundaryLoggerAspect;
 import com.dagacube.domain.service.PlayerServiceImpl;
 import com.dagacube.security.SecurityService;
 import com.dagacube.security.SecurityServiceImpl;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,6 +27,11 @@ public class DagacubeServiceConfig {
 	@Bean
 	public SecurityService securityService() {
 		return new SecurityServiceImpl();
+	}
+
+	@Bean
+	public PromotionService promotionService() {
+		return new PromotionServiceImpl();
 	}
 
 }

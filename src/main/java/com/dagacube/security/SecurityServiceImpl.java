@@ -1,8 +1,8 @@
 package com.dagacube.security;
 
 import com.dagacube.domain.repository.SystemUserRepository;
-import com.dagacube.domain.repository.entity.DagacubeSystemUser;
-import com.dagacube.exception.DagacubeUserAuthorizationException;
+import com.dagacube.domain.repository.entity.SystemUser;
+import com.dagacube.exception.SystemUserAuthorizationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -16,12 +16,12 @@ public class SecurityServiceImpl implements SecurityService {
 	private SystemUserRepository systemUserRepository;
 
 	@Override
-	public void verifyPassword(String username, String password) throws DagacubeUserAuthorizationException {
+	public void verifyPassword(String username, String password) throws SystemUserAuthorizationException {
 
-		DagacubeSystemUser user = systemUserRepository.findByUsername(username);
+		SystemUser user = systemUserRepository.findByUsername(username);
 
 		if (user == null || !bCryptPasswordEncoder.matches(password, user.getPassword())) {
-			throw new DagacubeUserAuthorizationException();
+			throw new SystemUserAuthorizationException();
 		}
 
 	}

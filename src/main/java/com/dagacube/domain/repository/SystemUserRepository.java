@@ -1,12 +1,12 @@
 package com.dagacube.domain.repository;
 
-import com.dagacube.domain.repository.entity.DagacubeSystemUser;
+import com.dagacube.domain.repository.entity.SystemUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SystemUserRepository extends JpaRepository<DagacubeSystemUser, Long> {
+public interface SystemUserRepository extends JpaRepository<SystemUser, Long> {
 
-	DagacubeSystemUser findByUsername(String username);
+	SystemUser findByUsername(String username);
 
 }

@@ -1,5 +1,6 @@
 package com.dagacube.domain.service;
 
+import com.dagacube.domain.model.WagerWinRequest;
 import com.dagacube.domain.types.TransactionType;
 import com.dagacube.domain.repository.PlayerRepository;
 import com.dagacube.domain.repository.PlayerTransactionRepository;
@@ -8,7 +9,6 @@ import com.dagacube.domain.repository.entity.PlayerTransaction;
 import com.dagacube.exception.PlayerExistsException;
 import com.dagacube.exception.PlayerNotFoundException;
 import com.dagacube.exception.PlayerInsufficientFundsException;
-import com.dagacube.exception.TransactionInconsistencyException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,6 +29,9 @@ public class PlayerServiceImpl implements PlayerService {
 	@Autowired
 	private PlayerTransactionRepository playerTransactionRepository;
 
+	@Autowired
+	private PromotionService promotionService;
+
 	@Override
 	public Long createPlayer(String username, BigDecimal balance) throws PlayerExistsException {
 		try {
@@ -46,40 +49,53 @@ public class PlayerServiceImpl implements PlayerService {
 
 	@Override
 	@Transactional
-	public PlayerTransaction wager(long playerId, BigDecimal amount, String transactionId) throws PlayerInsufficientFundsException, PlayerNotFoundException,
-			TransactionInconsistencyException {
+	public PlayerTransaction doWager(WagerWinRequest wager) throws PlayerInsufficientFundsException, PlayerNotFoundException {
 
 		//First order of business: idempotency
-		PlayerTransaction playerTransaction = playerTransactionRepository.findByTransactionId(transactionId).orElse(null);
+		PlayerTransaction playerTransaction = playerTransactionRepository.findByTransactionId(wager.getTransactionId()).orElse(null);
 		if (playerTransaction != null) {
-			if (amount.compareTo(playerTransaction.getAmount()) != 0 || playerId != playerTransaction.getPlayer().getId() || !playerTransaction.getTransactionType().equals(TransactionType.WAGER)) {
-				throw new TransactionInconsistencyException("playerId/amount/type inconsistent for given transactionId");
-			}
-			else {
-				return playerTransaction;
-			}
+			return playerTransaction;
 		}
 
-		Player player = getPlayerById(playerId);
+		Player player = getPlayerById(wager.getPlayerId());
+
+		//Business question: if the promotion fails, do we continue with the rest of the transaction. implemented = yes.
+		boolean promotionPreBehaviourSuccess = true;
+		try {
+			promotionService.executePreWagerPromotionBehaviours(wager, player);
+		} catch (Exception ex) {
+			log.error("Pre-wager promotion behaviour failed. Continuing. [winWagerRequest={}]", wager, ex);
+			promotionPreBehaviourSuccess = false;
+		}
+
 
 		//Check if player has enough funds
-		if (player.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+		if (player.getBalance().subtract(wager.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
 			throw new PlayerInsufficientFundsException();
 		}
 
 		//Create new transaction
-		BigDecimal newBalance = player.getBalance().subtract(amount);
+		BigDecimal newBalance = player.getBalance().subtract(wager.getAmount());
 		playerTransaction = PlayerTransaction.builder()
 				.player(player)
-				.transactionId(transactionId)
+				.transactionId(wager.getTransactionId())
 				.transactionType(TransactionType.WAGER)
 				.created(new Date())
-				.amount(amount)
+				.amount(wager.getAmount())
 				.postBalance(newBalance).build();
 		playerTransactionRepository.save(playerTransaction);
 
 		player.setBalance(newBalance);
 		playerRepository.save(player);
+
+		//Business question: If the post behaviour fails, do we throw an ex and rollback everything? Implemented = no.
+		if (promotionPreBehaviourSuccess) {
+			try {
+				promotionService.executePostWagerPromotionBehaviours(wager, player);
+			} catch (Exception ex) {
+				log.error("Post-wager promotion behaviour failed. Continuing. [winWagerRequest={}]", wager, ex);
+			}
+		}
 
 		return playerTransaction;
 
@@ -87,34 +103,42 @@ public class PlayerServiceImpl implements PlayerService {
 
 	@Override
 	@Transactional
-	public PlayerTransaction win(long playerId, BigDecimal amount, String transactionId) throws PlayerNotFoundException,
-			TransactionInconsistencyException {
+	public PlayerTransaction doWin(WagerWinRequest win) throws PlayerNotFoundException {
 		//First order of business: idempotency
-		PlayerTransaction playerTransaction = playerTransactionRepository.findByTransactionId(transactionId).orElse(null);
+		PlayerTransaction playerTransaction = playerTransactionRepository.findByTransactionId(win.getTransactionId()).orElse(null);
 		if (playerTransaction != null) {
-			if (amount.compareTo(playerTransaction.getAmount()) != 0 || playerId != playerTransaction.getPlayer().getId() || !playerTransaction.getTransactionType().equals(TransactionType.WIN)) {
-				throw new TransactionInconsistencyException("playerId/amount/type inconsistent for given transactionId");
-			}
-			else {
-				return playerTransaction;
-			}
+			return playerTransaction;
 		}
 
-		Player player = getPlayerById(playerId);
+		Player player = getPlayerById(win.getPlayerId());
+
+		//Business requirement: if the pre behaviour fails, do we continue with the rest of the transaction. implemented = yes.
+		try {
+			promotionService.executePreWinPromotionBehaviours(win, player);
+		} catch (Exception ex) {
+			log.error("Pre-win promotion behaviour failed. Continuing. [winWagerRequest={}]", win, ex);
+		}
 
 		//Create new transaction
-		BigDecimal newBalance = player.getBalance().add(amount);
+		BigDecimal newBalance = player.getBalance().add(win.getAmount());
 		playerTransaction = PlayerTransaction.builder()
 				.player(player)
-				.transactionId(transactionId)
+				.transactionId(win.getTransactionId())
 				.transactionType(TransactionType.WIN)
 				.created(new Date())
-				.amount(amount)
+				.amount(win.getAmount())
 				.postBalance(newBalance).build();
 		playerTransactionRepository.save(playerTransaction);
 
 		player.setBalance(newBalance);
 		playerRepository.save(player);
+
+		//Business requirement: If the post behaviour fails, do we throw an ex and rollback everything? Implemented = no.
+		try {
+			promotionService.executePostWinPromotionBehaviours(win, player);
+		} catch (Exception ex) {
+			log.error("Pre-win promotion behaviour failed. Continuing. [winWagerRequest={}]", win, ex);
+		}
 
 		return playerTransaction;
 	}

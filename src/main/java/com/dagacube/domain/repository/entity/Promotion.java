@@ -16,14 +16,19 @@ import javax.persistence.Id;
 @Builder
 @Data
 @Entity
-public class DagacubeSystemUser {
+public class Promotion {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
 	@Column(unique = true, nullable = false)
-	private String username;
+	private String code;
 
 	@Column(nullable = false)
-	private String password;
+	private String behaviourFqcn;
+
+	@Column
+	private String dataValue;
+
 }

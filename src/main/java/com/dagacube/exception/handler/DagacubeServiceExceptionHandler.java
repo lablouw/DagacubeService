@@ -1,10 +1,9 @@
 package com.dagacube.exception.handler;
 
-import com.dagacube.exception.DagacubeUserAuthorizationException;
 import com.dagacube.exception.PlayerExistsException;
-import com.dagacube.exception.PlayerNotFoundException;
 import com.dagacube.exception.PlayerInsufficientFundsException;
-import com.dagacube.exception.TransactionInconsistencyException;
+import com.dagacube.exception.PlayerNotFoundException;
+import com.dagacube.exception.SystemUserAuthorizationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -46,13 +45,8 @@ public class DagacubeServiceExceptionHandler extends ResponseEntityExceptionHand
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
 	}
 
-	@ExceptionHandler(TransactionInconsistencyException.class)
-	public final ResponseEntity handleTransactionInconsistencyException(TransactionInconsistencyException ex) {
-		return ResponseEntity.badRequest().body(ex.getMessage());
-	}
-
-	@ExceptionHandler(DagacubeUserAuthorizationException.class)
-	public final ResponseEntity handleDagacubeUserAuthorizationException(DagacubeUserAuthorizationException ex) {
+	@ExceptionHandler(SystemUserAuthorizationException.class)
+	public final ResponseEntity handleDagacubeUserAuthorizationException(SystemUserAuthorizationException ex) {
 		return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 	}
 
