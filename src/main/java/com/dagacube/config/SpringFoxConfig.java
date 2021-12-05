@@ -11,8 +11,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SpringFoxConfig {
-    //For Api documentation: http://localhost:9000/swagger-ui.html
-    //For yaml: http://localhost:9000/v2/api-docs
+    //For Api documentation: http://localhost:9000/dagacube-service/swagger-ui.html#/
+    //For yaml: http://localhost:9000/dagacube-service/v2/api-docs
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)

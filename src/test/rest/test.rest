@@ -15,11 +15,12 @@ GET http://localhost:9000/dagacube-service/v1/dagacubeService/1/balance
 ### Wager
 POST http://localhost:9000/dagacube-service/v1/dagacubeService/wager
 Content-Type: application/json
-TransactionId: txn6
+TransactionId: txn1
 
 {
   "playerId": "1",
-  "amount": 50
+  "amount": 50,
+  "promoCode": "paper"
 }
 
 

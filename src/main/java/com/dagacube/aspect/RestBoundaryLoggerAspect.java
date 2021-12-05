@@ -76,6 +76,7 @@ public class RestBoundaryLoggerAspect {
             }
         }
 
+        //It is debatable whether we want to log POST bodies here as they may display sensitive info in the logs. This could be made configurable
         log.info("Inbound: [method={}, uri={}, args={}, headers={}]", method, uri, StringUtils.arrayToCommaDelimitedString(pjp.getArgs()), String.join(",", headers));
 
         long t = System.currentTimeMillis();
