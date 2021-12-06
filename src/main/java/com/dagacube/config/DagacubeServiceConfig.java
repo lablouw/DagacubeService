@@ -7,7 +7,6 @@ import com.dagacube.aspect.RestBoundaryLoggerAspect;
 import com.dagacube.domain.service.PlayerServiceImpl;
 import com.dagacube.security.SecurityService;
 import com.dagacube.security.SecurityServiceImpl;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

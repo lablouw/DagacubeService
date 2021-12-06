@@ -32,7 +32,7 @@ public class DagacubeServiceExceptionHandler extends ResponseEntityExceptionHand
 
 	@ExceptionHandler(PlayerInsufficientFundsException.class)
 	public final ResponseEntity handlePlayerOutOfFundsException(PlayerInsufficientFundsException ex) {
-		return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body("Player is broke, give 'em some tea!");
+		return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).body("Player does not have enough funds.");
 	}
 
 	@ExceptionHandler(PlayerNotFoundException.class)
