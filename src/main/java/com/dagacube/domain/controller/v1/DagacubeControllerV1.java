@@ -60,7 +60,7 @@ public class DagacubeControllerV1 {
 	@GetMapping(value = "/{playerId}/balance")
 	public ResponseEntity<BigDecimal> getUserBalance(@PathVariable int playerId) throws PlayerNotFoundException {
 
-		return ResponseEntity.ok().body(playerService.getUserBalance(playerId));
+		return ResponseEntity.ok().body(playerService.getPlayerBalance(playerId));
 
 	}
 

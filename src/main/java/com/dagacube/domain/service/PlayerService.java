@@ -13,7 +13,7 @@ public interface PlayerService {
 
 	Long createPlayer(String username, BigDecimal balance) throws PlayerExistsException;
 
-	BigDecimal getUserBalance(long playerId) throws PlayerNotFoundException;
+	BigDecimal getPlayerBalance(long playerId) throws PlayerNotFoundException;
 
 	PlayerTransaction doWager(WagerWinRequest wagerWinRequest) throws PlayerInsufficientFundsException, PlayerNotFoundException;
 

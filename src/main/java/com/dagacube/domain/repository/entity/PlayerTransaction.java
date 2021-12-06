@@ -1,6 +1,6 @@
 package com.dagacube.domain.repository.entity;
 
-import com.dagacube.domain.types.TransactionType;
+import com.dagacube.domain.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

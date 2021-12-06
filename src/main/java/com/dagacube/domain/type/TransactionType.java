@@ -1,4 +1,4 @@
-package com.dagacube.domain.types;
+package com.dagacube.domain.type;
 
 public enum TransactionType {
 	WAGER,

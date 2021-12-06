@@ -1,7 +1,7 @@
 package com.dagacube.domain.service;
 
 import com.dagacube.domain.model.WagerWinRequest;
-import com.dagacube.domain.types.TransactionType;
+import com.dagacube.domain.type.TransactionType;
 import com.dagacube.domain.repository.PlayerRepository;
 import com.dagacube.domain.repository.PlayerTransactionRepository;
 import com.dagacube.domain.repository.entity.Player;
@@ -43,7 +43,7 @@ public class PlayerServiceImpl implements PlayerService {
 
 	@Override
 	@Transactional
-	public BigDecimal getUserBalance(long playerId) throws PlayerNotFoundException {
+	public BigDecimal getPlayerBalance(long playerId) throws PlayerNotFoundException {
 		return getPlayerById(playerId).getBalance();
 	}
 
@@ -70,12 +70,12 @@ public class PlayerServiceImpl implements PlayerService {
 
 
 		//Check if player has enough funds
-		if (player.getBalance().subtract(wager.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
+		BigDecimal newBalance = player.getBalance().subtract(wager.getAmount());
+		if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
 			throw new PlayerInsufficientFundsException();
 		}
 
 		//Create new transaction
-		BigDecimal newBalance = player.getBalance().subtract(wager.getAmount());
 		playerTransaction = PlayerTransaction.builder()
 				.player(player)
 				.transactionId(wager.getTransactionId())
