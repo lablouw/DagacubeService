@@ -48,7 +48,7 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackOn = {Exception.class})
 	public PlayerTransaction doWager(WagerWinRequest wager) throws PlayerInsufficientFundsException, PlayerNotFoundException {
 
 		//First order of business: idempotency
@@ -102,7 +102,7 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(rollbackOn = {Exception.class})
 	public PlayerTransaction doWin(WagerWinRequest win) throws PlayerNotFoundException {
 		//First order of business: idempotency
 		PlayerTransaction playerTransaction = playerTransactionRepository.findByTransactionId(win.getTransactionId()).orElse(null);

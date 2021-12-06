@@ -65,7 +65,8 @@ public class DagacubeControllerV1 {
 	}
 
 	@PostMapping(value = "/wager", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity wager(@RequestBody WagerWinRequest wagerWinRequest, @RequestHeader String transactionId) throws PlayerInsufficientFundsException, PlayerNotFoundException {
+	public ResponseEntity wager(@RequestBody WagerWinRequest wagerWinRequest, @RequestHeader String transactionId) throws
+			PlayerInsufficientFundsException, PlayerNotFoundException {
 		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(wagerWinRequest);
 		if (validationResult != null) {
 			return validationResult;
