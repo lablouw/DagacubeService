@@ -1,6 +1,12 @@
 # Dagacube-Service
 Dagacube Service Demo as per requirements.
 
+**Notes** 
+
+- I've added a "create player" endpoint for testing purposes (see 4.1).
+- The promotion system was designed so that new promotions could easily be added in the future, and that their behaviour definition allowed for actions to be performed at different stages of both the wager and win processes.
+- I decided to defy the CEO's requirement of a single service class and separated functionality into 3 service classes. 10 minutes spent now is an hour saved later.
+
 ## **1. Prerequisites**
 
 1. Java runtime
@@ -95,7 +101,7 @@ curl --request GET \
 
 **Return statuses:**
 
-*200 OK:* Transaction performed
+*200 OK:* Transaction performed (history item id returned in body)
 
 
 ### *4.4. Win*
@@ -120,17 +126,16 @@ curl --request POST \
 
 **Return statuses:**
 
-*200 OK:* Transaction performed
+*200 OK:* Transaction performed (history item id returned in body)
 
 
 ### *4.4. Get player's transaction history*
-This request is idempotent on the transactionId header.
 
 **Url**: (POST) http://localhost:9000/dagacube-service/v1/dagacubeService/transactions
 
 **Headers**: Content-Type: application/json
 
-**Body**: (json data, fields are required)
+**Body**: (json data, all fields are required)
 
 ```
 curl --request POST \
