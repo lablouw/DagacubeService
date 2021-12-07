@@ -11,7 +11,7 @@ import com.dagacube.exception.PlayerNotFoundException;
 import com.dagacube.exception.SystemUserAuthorizationException;
 import com.dagacube.mapper.PlayerTransactionMapper;
 import com.dagacube.mapper.WagerWinRequestMapper;
-import com.dagacube.security.SecurityService;
+import com.dagacube.domain.service.SecurityService;
 import com.dagacube.util.validation.ValidationUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

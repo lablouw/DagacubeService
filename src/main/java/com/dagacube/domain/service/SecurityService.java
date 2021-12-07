@@ -1,4 +1,4 @@
-package com.dagacube.security;
+package com.dagacube.domain.service;
 
 import com.dagacube.exception.SystemUserAuthorizationException;
 

@@ -60,12 +60,12 @@ public class PlayerServiceImpl implements PlayerService {
 		Player player = getPlayerById(wager.getPlayerId());
 
 		//Business question: if the promotion fails, do we continue with the rest of the transaction. implemented = yes.
-		boolean promotionPreBehaviourSuccess = true;
+		boolean promotionPreBehaviourFailed = false;
 		try {
 			promotionService.executePreWagerPromotionBehaviours(wager, player);
 		} catch (Exception ex) {
 			log.error("Pre-wager promotion behaviour failed. Continuing. [winWagerRequest={}]", wager, ex);
-			promotionPreBehaviourSuccess = false;
+			promotionPreBehaviourFailed = true;
 		}
 
 
@@ -89,7 +89,7 @@ public class PlayerServiceImpl implements PlayerService {
 		playerRepository.save(player);
 
 		//Business question: If the post behaviour fails, do we throw an ex and rollback everything? Implemented = no.
-		if (promotionPreBehaviourSuccess) {
+		if (!promotionPreBehaviourFailed) {
 			try {
 				promotionService.executePostWagerPromotionBehaviours(wager, player);
 			} catch (Exception ex) {
@@ -113,10 +113,12 @@ public class PlayerServiceImpl implements PlayerService {
 		Player player = getPlayerById(win.getPlayerId());
 
 		//Business requirement: if the pre behaviour fails, do we continue with the rest of the transaction. implemented = yes.
+		boolean promotionPreBehaviourFailed = false;
 		try {
 			promotionService.executePreWinPromotionBehaviours(win, player);
 		} catch (Exception ex) {
 			log.error("Pre-win promotion behaviour failed. Continuing. [winWagerRequest={}]", win, ex);
+			promotionPreBehaviourFailed = true;
 		}
 
 		//Create new transaction
@@ -134,10 +136,12 @@ public class PlayerServiceImpl implements PlayerService {
 		playerRepository.save(player);
 
 		//Business requirement: If the post behaviour fails, do we throw an ex and rollback everything? Implemented = no.
-		try {
-			promotionService.executePostWinPromotionBehaviours(win, player);
-		} catch (Exception ex) {
-			log.error("Pre-win promotion behaviour failed. Continuing. [winWagerRequest={}]", win, ex);
+		if (!promotionPreBehaviourFailed) {
+			try {
+				promotionService.executePostWinPromotionBehaviours(win, player);
+			} catch (Exception ex) {
+				log.error("Pre-win promotion behaviour failed. Continuing. [winWagerRequest={}]", win, ex);
+			}
 		}
 
 		return playerTransaction;

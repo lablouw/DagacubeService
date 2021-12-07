@@ -1,5 +1,6 @@
 package com.dagacube;
 
+import com.dagacube.api.v1.model.WagerWinRequest;
 import com.dagacube.domain.repository.entity.Player;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -30,8 +31,8 @@ public class DagacubeControllerV1Test {
 
 	private static final String CONTEXT_PATH = "/v1/dagacubeService";
 	private static final String URI_BALANCE = CONTEXT_PATH+"/{playerId}/balance";
-	private static final String URI_WAGER = CONTEXT_PATH+"/{playerId}/wager/{amount}";
-	private static final String URI_WIN = CONTEXT_PATH+"/{playerId}/win/{amount}";
+	private static final String URI_WAGER = CONTEXT_PATH+"/wager";
+	private static final String URI_WIN = CONTEXT_PATH+"/win";
 
 	@Autowired
 	private MockMvc mvc;
@@ -84,23 +85,28 @@ public class DagacubeControllerV1Test {
 				.andExpect(status().isCreated());
 		long playerId = Long.parseLong(resultActions.andReturn().getResponse().getContentAsString());
 
-		int amount = new Random().nextInt(10);
+		BigDecimal amount = new BigDecimal(new Random().nextInt(10));
 		String txnId = UUID.randomUUID().toString();
 
 		//Test first win
+		WagerWinRequest wagerWinRequest = WagerWinRequest.builder().playerId(playerId).amount(amount).build();
 		ResultActions winResultActions1 = mvc.perform(MockMvcRequestBuilders
-						.post(URI_WIN, playerId, amount)
+						.post(URI_WIN)
+						.contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(gson.toJson(wagerWinRequest))
 						.header("transactionId", txnId))
 				.andExpect(status().isOk());
 
 		String winSystemId1 = winResultActions1.andReturn().getResponse().getContentAsString();
 		ResultActions balanceResultActions1 = mvc.perform(get(URI_BALANCE, playerId)).andExpect(status().isOk());
 		BigDecimal balance1 = new BigDecimal(balanceResultActions1.andReturn().getResponse().getContentAsString());
-		assertEquals(0, BigDecimal.TEN.add(new BigDecimal(amount)).compareTo(balance1));
+		assertEquals(0, BigDecimal.TEN.add(amount).compareTo(balance1));
 
 		//Test second win to be idempotent
 		ResultActions winResultActions2 = mvc.perform(MockMvcRequestBuilders
-						.post(URI_WIN, playerId, amount)
+						.post(URI_WIN)
+						.contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(gson.toJson(wagerWinRequest))
 						.header("transactionId", txnId))
 				.andExpect(status().isOk());
 
@@ -124,23 +130,28 @@ public class DagacubeControllerV1Test {
 				.andExpect(status().isCreated());
 		long playerId = Long.parseLong(resultActions.andReturn().getResponse().getContentAsString());
 
-		int amount = new Random().nextInt(10);
+		BigDecimal amount = new BigDecimal(new Random().nextInt(10));
 		String txnId = UUID.randomUUID().toString();
 
 		//Test first wager
+		WagerWinRequest wagerWinRequest = WagerWinRequest.builder().playerId(playerId).amount(amount).build();
 		ResultActions wagerResultActions1 = mvc.perform(MockMvcRequestBuilders
-						.post(URI_WAGER, playerId, amount)
+						.post(URI_WAGER)
+						.contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(gson.toJson(wagerWinRequest))
 						.header("transactionId", txnId))
 				.andExpect(status().isOk());
 
 		String wagerSystemId1 = wagerResultActions1.andReturn().getResponse().getContentAsString();
 		ResultActions balanceResultActions1 = mvc.perform(get(URI_BALANCE, playerId)).andExpect(status().isOk());
 		BigDecimal balance1 = new BigDecimal(balanceResultActions1.andReturn().getResponse().getContentAsString());
-		assertEquals(0, BigDecimal.TEN.subtract(new BigDecimal(amount)).compareTo(balance1));
+		assertEquals(0, BigDecimal.TEN.subtract(amount).compareTo(balance1));
 
 		//Test second wager to be idempotent
 		ResultActions wagerResultActions2 = mvc.perform(MockMvcRequestBuilders
-						.post(URI_WAGER, playerId, amount)
+						.post(URI_WAGER)
+						.contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(gson.toJson(wagerWinRequest))
 						.header("transactionId", txnId))
 				.andExpect(status().isOk());
 
@@ -164,9 +175,14 @@ public class DagacubeControllerV1Test {
 				.andExpect(status().isCreated());
 		long playerId = Long.parseLong(resultActions.andReturn().getResponse().getContentAsString());
 
+		String txnId = UUID.randomUUID().toString();
+		WagerWinRequest wagerWinRequest = WagerWinRequest.builder().playerId(playerId).amount(new BigDecimal(11)).build();
+
 		ResultActions wagerResultActions = mvc.perform(MockMvcRequestBuilders
-						.post(URI_WAGER, playerId, 11)
-						.header("transactionId", UUID.randomUUID().toString()))
+						.post(URI_WAGER)
+						.contentType(MediaType.APPLICATION_JSON_VALUE)
+						.content(gson.toJson(wagerWinRequest))
+						.header("transactionId", txnId))
 				.andExpect(status().isIAmATeapot());
 
 	}
