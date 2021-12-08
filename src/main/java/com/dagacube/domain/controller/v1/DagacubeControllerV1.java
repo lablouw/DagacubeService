@@ -46,7 +46,7 @@ public class DagacubeControllerV1 {
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> createPlayer(@RequestBody Player player) throws PlayerExistsException {
+	public ResponseEntity createPlayer(@RequestBody Player player) throws PlayerExistsException {
 		ResponseEntity<List<String>> validationResult = ValidationUtil.validate(player);
 		if (validationResult != null) {
 			return validationResult;
@@ -94,7 +94,7 @@ public class DagacubeControllerV1 {
 	}
 
 	@PostMapping(value = "/transactions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getUserTransactions(@RequestBody PlayerTransactionsRequest playerTransactionsRequest) throws PlayerNotFoundException,
+	public ResponseEntity getUserTransactions(@RequestBody PlayerTransactionsRequest playerTransactionsRequest) throws PlayerNotFoundException,
 			SystemUserAuthorizationException {
 
 		securityService.verifyPassword(PLAYER_HISTORY_USER, playerTransactionsRequest.getPassword());

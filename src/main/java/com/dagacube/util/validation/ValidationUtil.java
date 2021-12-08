@@ -9,7 +9,6 @@ import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
@@ -24,8 +23,8 @@ public class ValidationUtil {
 
 	private static ResponseEntity<List<String>> validateInternal(List<String> validationFailures, Object... objects) {
 		for (Object o : objects) {
-			if (o instanceof Iterable) {
-				((Iterable)o).forEach(o1 -> validateInternal(validationFailures, o1));
+			if (o instanceof Iterable<?> iterable) {
+				iterable.forEach(o1 -> validateInternal(validationFailures, o1));
 			} else {
 				validateSingleObject(o, validationFailures);
 			}
@@ -47,7 +46,7 @@ public class ValidationUtil {
 			validationFailures.addAll(constraintViolations
 					.stream()
 					.map(cv -> cv.getLeafBean().toString() + ": "+cv.getPropertyPath()+": " + cv.getMessage())
-					.collect(Collectors.toList())
+					.toList()
 			);
 		}
 	}

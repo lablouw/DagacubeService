@@ -90,9 +90,8 @@ public class RestBoundaryLoggerAspect {
         }
         t = System.currentTimeMillis() - t;
 
-        if (ret instanceof ResponseEntity) {
-            ResponseEntity<?> re = (ResponseEntity) ret;
-            log.info("Outbound: [method={}, uri={}, duration={}, responseStatusCode={}, responseBody={}, responseHeaders={}]", method, uri, t, re.getStatusCodeValue(), re.getBody(), re.getHeaders());
+        if (ret instanceof ResponseEntity<?> responseEntity) {
+            log.info("Outbound: [method={}, uri={}, duration={}, responseStatusCode={}, responseBody={}, responseHeaders={}]", method, uri, t, responseEntity.getStatusCodeValue(), responseEntity.getBody(), responseEntity.getHeaders());
         } else {
             log.info("Outbound: [method={}, uri={}, duration={}, responseObject={}]", method, uri, t, ret, ex);
         }
@@ -105,7 +104,7 @@ public class RestBoundaryLoggerAspect {
     }
 
     private boolean isSensitive(String value) {
-        return Arrays.stream(secureFieldNames).anyMatch(s -> s.equals(value.toLowerCase()));
+        return Arrays.stream(secureFieldNames).anyMatch(s -> s.equalsIgnoreCase(value));
     }
 
 }

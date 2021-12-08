@@ -45,8 +45,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 		//Execute any other promotions the player may have
 		List<PlayerPromotion> playerPromotions = playerPromotionRepository.findAllByPlayerId(player.getId());
-		for (PlayerPromotion playerPromotion : playerPromotions) 
-		{
+		for (PlayerPromotion playerPromotion : playerPromotions) {
 			Promotion promotion = playerPromotion.getPromotion();
 			if (executedPromotionId == null || promotion.getId() != executedPromotionId) {
 				PromotionBehaviour promotionBehaviour = getByFqcn(promotion.getBehaviourFqcn());
@@ -70,8 +69,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 		//Execute any other promotions the player may have
 		List<PlayerPromotion> playerPromotions = playerPromotionRepository.findAllByPlayerId(player.getId());
-		for (PlayerPromotion playerPromotion : playerPromotions)
-		{
+		for (PlayerPromotion playerPromotion : playerPromotions) {
 			Promotion promotion = playerPromotion.getPromotion();
 			if (executedPromotionId == null || promotion.getId() != executedPromotionId) {
 				PromotionBehaviour promotionBehaviour = getByFqcn(promotion.getBehaviourFqcn());
@@ -95,8 +93,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 		//Execute any other promotions the player may have
 		List<PlayerPromotion> playerPromotions = playerPromotionRepository.findAllByPlayerId(player.getId());
-		for (PlayerPromotion playerPromotion : playerPromotions)
-		{
+		for (PlayerPromotion playerPromotion : playerPromotions) {
 			Promotion promotion = playerPromotion.getPromotion();
 			if (executedPromotionId == null || promotion.getId() != executedPromotionId) {
 				PromotionBehaviour promotionBehaviour = getByFqcn(promotion.getBehaviourFqcn());
@@ -120,8 +117,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 		//Execute any other promotions the player may have
 		List<PlayerPromotion> playerPromotions = playerPromotionRepository.findAllByPlayerId(player.getId());
-		for (PlayerPromotion playerPromotion : playerPromotions)
-		{
+		for (PlayerPromotion playerPromotion : playerPromotions) {
 			Promotion promotion = playerPromotion.getPromotion();
 			if (executedPromotionId == null || promotion.getId() != executedPromotionId) {
 				PromotionBehaviour promotionBehaviour = getByFqcn(promotion.getBehaviourFqcn());
@@ -131,7 +127,7 @@ public class PromotionServiceImpl implements PromotionService {
 
 	}
 
-	private PromotionBehaviour getByFqcn(String fqcn) throws ClassNotFoundException {
+	private synchronized PromotionBehaviour getByFqcn(String fqcn) throws ClassNotFoundException {
 		PromotionBehaviour promotionBehaviour = promotionBehaviourMap.get(fqcn);
 		if (promotionBehaviour == null) {
 			try {

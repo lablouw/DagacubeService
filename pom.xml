@@ -13,7 +13,7 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <org.projectlombok.version>1.18.22</org.projectlombok.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <io.springfox.version>2.7.0</io.springfox.version>

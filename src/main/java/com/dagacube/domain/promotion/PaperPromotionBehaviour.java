@@ -18,8 +18,6 @@ public class PaperPromotionBehaviour implements PromotionBehaviour {
 
 	@Override
 	public void preWager(WagerWinRequest wagerWinRequest, Player player, Promotion promotion) {
-
-
 		PlayerPromotion playerPromotion = playerPromotionRepository.getByPlayerIdAndPromotionId(wagerWinRequest.getPlayerId(), promotion.getId());
 
 		if (playerPromotion == null) {
